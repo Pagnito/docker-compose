@@ -1,6 +1,9 @@
-Install docker and docker-compose
-Run docker-compose build
-Run docker-compose up
+1. Install docker and docker-compose
+2. Run docker-compose build
+3. Run docker-compose up
+4. If backend fails, run 3 again
+
+I set a timeout on creating table, didnt have time to find a way to create table after db was created.
 
 I used console.log for logging to log errors and payloads. We can direct those logs to wherever we need and can monitor more than just "request happened".
 
