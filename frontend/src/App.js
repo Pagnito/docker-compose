@@ -116,8 +116,8 @@ const App = () => {
         <div className='mx-3 mt-3'><StatusPopup status={error} toggle={() => setError(null)} /></div>
         : false}
       <div className="flex justify-between p-4">
-        <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search..." className='px-3 py-2 rounded-md border-2 border-black'></input>
-        <button onClick={() => showAddCarModal(addCarModal ? false : true)} className="px-3 py-2 rounded-md text-black border-2 border-black hover:bg-black hover:text-white transition-all font-bold">Add Car</button>
+        <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search..." className='px-3 py-2 rounded-md border-2 border-black xs:w-3/5 sm:w-auto'></input>
+        <button onClick={() => showAddCarModal(addCarModal ? false : true)} className="xs:w-2/5 xs:ml-2 sm:ml-0 sm:w-auto px-3 py-2 rounded-md text-black border-2 border-black hover:bg-black hover:text-white transition-all font-bold">Add Car</button>
       </div>
       <div className='px-4'>
         {sourceCarsList === null ?  
