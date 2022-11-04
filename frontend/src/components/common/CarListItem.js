@@ -7,7 +7,7 @@ const CarListItem = ({car, isCollapsed, dropDown, edit, trash}) => {
         <div >{car.make + ' ' + car.model + ' ' + car.package} </div>
         <div className='flex items-center'>
           <BsEye onClick={() => dropDown(car.id)} size="19" className='text-black mr-6 hover:text-purple-900 text-bold' />
-          <BsPencil className='text-black mr-6 hover:text-purple-900 text-bold' />
+          <BsPencil onClick={edit} className='text-black mr-6 hover:text-purple-900 text-bold' />
           <BsTrash onClick={trash} className='text-black mr-2 hover:text-purple-900 text-bold' />
 
         </div>

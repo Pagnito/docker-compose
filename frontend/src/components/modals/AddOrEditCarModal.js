@@ -2,16 +2,16 @@ import { useState } from 'react';
 import carsApi from '../../api';
 import StatusPopup from '../common/StatusPopup';
 
-const AddOrEditCarModal = ({ toggle, addCarToState }) => {
+const AddOrEditCarModal = ({ toggle, addCarToState, edit }) => {
   const [state, setState] = useState({
-    make: '',
-    model: '',
-    package: '',
-    color: '',
-    year: '',
-    category: '',
-    mileage: '',
-    "price(cents)": ''
+    make: edit ? edit.make : '',
+    model: edit ? edit.model : '',
+    package: edit ? edit.package : '',
+    color: edit ? edit.color : '',
+    year: edit ? edit.year : '',
+    category: edit ? edit.category : '',
+    mileage: edit ? edit.mileage : '',
+    "price(cents)": edit ? edit['price(cents)'] : ''
   });
 
   const [error, setError] = useState(null);
@@ -49,19 +49,25 @@ const AddOrEditCarModal = ({ toggle, addCarToState }) => {
   const saveCar = async () => {
     try {
       if(validated()) {
-        const res = await carsApi.postCar(state);
-        console.log(res)
-        const car = {...state, id: res.data.id};
+        let res;
+        let car;
+        if(edit) {
+          res = await carsApi.editCar(edit.id, state);
+          car = {...state, id: edit.id};
+        } else {
+          res = await carsApi.postCar(state);
+          car = {...state, id: res.data.id};
+        }
         addCarToState(car);
         setSuccess('Success!');
         toggle();
       }
 
     } catch (err) {
-      console.log(err)
       setError('Failed to save car.');
     }
   }
+
 
   return (
     <div style={{ background: 'rgba(0,0,0,.6)' }} className='fixed h-screen w-full xs:p-2 md:p-20 flex justify-center items-center top-0'>
@@ -71,7 +77,7 @@ const AddOrEditCarModal = ({ toggle, addCarToState }) => {
           {error !== null ? <StatusPopup status={error} type="error" toggle={() => setError(null)} /> : false}
           {success !== null ? <StatusPopup status={success} type="success" toggle={() => setSuccess(null)}/>: false}
           <div className='flex w-full xs:flex-col md:flex-row'>
-            <input onChange={onChange} value={state.name} name="make" placeholder="Make" type="text" className='px-3 py-2 rounded-md border-2 border-black mt-3 md:w-1/2 md:mr-2'></input>
+            <input onChange={onChange} value={state.make} name="make" placeholder="Make" type="text" className='px-3 py-2 rounded-md border-2 border-black mt-3 md:w-1/2 md:mr-2'></input>
             <input onChange={onChange} value={state.model} name="model" placeholder="Model" type="text" className='px-3 py-2 rounded-md border-2 border-black mt-3 md:w-1/2 md:ml-2'></input>
           </div>
           <div className='flex w-full xs:flex-col md:flex-row'>

@@ -8,36 +8,27 @@ import carsApi from './api'
 
 const App = () => {
   const [sourceCarsList, setSourceCarsList] = useState([]);
-  const [carsList, setCarsList] = useState([{
-    id: 1,
-    make: 'Honda',
-    model: 'Civic',
-    package: 'Si',
-    mileage: '15000',
-    "price(cents)": '223525'
-  },
-  {
-    id: 2,
-    make: 'Honda',
-    model: 'Civic',
-    package: 'Type R',
-    mileage: '10000',
-    "price(cents)": '223525'
-  }
-  ]);
-
+  const [carsList, setCarsList] = useState(null);
   const [collapsed, setCollapsed] = useState([]);
   const [addCarModal, showAddCarModal] = useState(false);
-  const [deleteItem, setDeleteItem] = useState(false);
+  const [deleteItem, setDeleteItem] = useState(null);
+  const [editItem, setEditItem] = useState(null)
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
 
 
   const getCars = async () => {
-    const cars = await carsApi.getCars();
-    if (cars.data.length > 0) {
-      setCarsList(cars.data);
-      setSourceCarsList(cars.data);
+    try {
+      const cars = await carsApi.getCars();
+      if (cars.data.length > 0) {
+        let sorted = cars.data.sort((a ,b) => {
+          return new Date(b.created_at) - new Date(a.created_at);
+        })
+        setCarsList(sorted);
+        setSourceCarsList(sorted);
+      }
+    } catch (err) {
+      setError('Failed to load your cars.')
     }
   }
 
@@ -72,7 +63,7 @@ const App = () => {
   const carsMap = () => {
     return carsList.map(car => {
       let isCollapsed = collapsed.includes(car.id);
-      return <CarListItem isCollapsed={isCollapsed} car={car} dropDown={dropDown} trash={() => setDeleteItem(car.id)} edit={carsApi.editCar} />
+      return <CarListItem isCollapsed={isCollapsed} car={car} dropDown={dropDown} trash={() => setDeleteItem(car.id)} edit={() => editCar(car)} />
     })
   }
 
@@ -87,12 +78,25 @@ const App = () => {
     }
   }
 
+  const editCar = (car) => {
+    setEditItem(car);
+    showAddCarModal(true);
+  }
+
   const addCarToState = (car) => {
-    setCarsList([car, ...carsList]);
+    let exists = carsList.findIndex(c => c.id === car.id);
+
+    if(exists!== -1) {
+      let clone = carsList.slice(0);
+      clone.splice(exists, 1, car);
+      setCarsList(clone);
+    } else {
+      setCarsList([car, ...carsList]);
+    }
   }
 
   return (
-    <div className=" bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen">
       <header className="w-full p-4 border-b-2 border-purple-900 text-center text-black font-bold shadow-lg">
         yOurCARS
       </header>
@@ -103,10 +107,12 @@ const App = () => {
         <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search..." className='px-3 py-2 rounded-md border-2 border-black'></input>
         <button onClick={() => showAddCarModal(addCarModal ? false : true)} className="px-3 py-2 rounded-md text-black border-2 border-black hover:bg-black hover:text-white transition-all font-bold">Add Car</button>
       </div>
-      <div className=' px-4'>
-        {carsMap()}
+      <div className='px-4'>
+        {carsList === null ?  
+        <div className='flex p-4 items-center justify-center font-bold'>Loading...</div> :
+        carsMap()}
       </div>
-      {addCarModal ? <AddOrEditCarModal addCarToState={addCarToState} toggle={() => showAddCarModal(false)} /> : false}
+      {addCarModal || editItem !== null ? <AddOrEditCarModal edit={editItem} addCarToState={addCarToState} toggle={() => {showAddCarModal(false); setEditItem(null)}} /> : false}
       {deleteItem ? <AreYouSureModal action={deleteCar} toggle={() => setDeleteItem(false)} /> : false}
     </div>
   );

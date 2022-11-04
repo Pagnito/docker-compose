@@ -11,6 +11,7 @@ const createCarsTable = (db) => {
         t.string('category', 100);
         t.integer('mileage');
         t.bigInteger('price(cents)');
+        t.timestamp('created_at').defaultTo(db.fn.now());
       });
     }
   });

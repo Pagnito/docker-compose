@@ -20,7 +20,6 @@ export default {
   },
   postCar: async (car) => {
     try {
-      console.log('POSTING')
       return await axios.post(url+'cars', car);
     } catch (err) {
       console.log('\n\n API ERROR - POST CAR: ' + err.message);
