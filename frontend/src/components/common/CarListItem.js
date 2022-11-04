@@ -1,6 +1,14 @@
 import { BsTrash, BsPencil, BsEye } from 'react-icons/bs'
 
 const CarListItem = ({car, isCollapsed, dropDown, edit, trash}) => {
+
+  const toUSD = (num) => {
+    return (num).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    })
+  }
+
   return (
     <div key={car.id} className={`mt-2 p-2 border-2 border-purple-700 font-bold rounded-md cursor-pointer transition-all ${isCollapsed ? 'bg-purple-200' : ''}`}>
       <div className='flex justify-between'>
@@ -23,7 +31,11 @@ const CarListItem = ({car, isCollapsed, dropDown, edit, trash}) => {
         </div>
         <div className={`flex ${isCollapsed ? 'mt-1' : ''}`}>
           <div>{`Price:`}</div>
-          <div className='ml-1'>{car['price(cents)']}</div>
+          <div className='ml-1'>{toUSD(car['price(cents)'] / 100)}</div>
+        </div>
+        <div className={`flex ${isCollapsed ? 'mt-1' : ''}`}>
+          <div>{`Mileage:`}</div>
+          <div className='ml-1'>{car.mileage}</div>
         </div>
       </div>
     </div>

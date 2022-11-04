@@ -11,7 +11,7 @@ const AddOrEditCarModal = ({ toggle, addCarToState, edit }) => {
     year: edit ? edit.year : '',
     category: edit ? edit.category : '',
     mileage: edit ? edit.mileage : '',
-    "price(cents)": edit ? edit['price(cents)'] : ''
+    "price(cents)": edit ? edit['price(cents)'] / 100 : ''
   });
 
   const [error, setError] = useState(null);
@@ -53,10 +53,11 @@ const AddOrEditCarModal = ({ toggle, addCarToState, edit }) => {
         let car;
         if(edit) {
           res = await carsApi.editCar(edit.id, state);
-          car = {...state, id: edit.id};
+          car = {...state, id: edit.id, ['price(cents)']: state['price(cents)'] * 100};
         } else {
-          res = await carsApi.postCar(state);
-          car = {...state, id: res.data.id};
+          car = {...state, ['price(cents)']: state['price(cents)'] * 100}
+          res = await carsApi.postCar(car);
+          car = {...state, id: res.data.id, ['price(cents)']: state['price(cents)'] * 100};
         }
         addCarToState(car);
         setSuccess('Success!');

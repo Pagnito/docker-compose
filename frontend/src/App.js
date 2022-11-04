@@ -6,8 +6,9 @@ import CarListItem from './components/common/CarListItem';
 import StatusPopup from './components/common/StatusPopup'
 import carsApi from './api'
 
+
 const App = () => {
-  const [sourceCarsList, setSourceCarsList] = useState([]);
+  const [sourceCarsList, setSourceCarsList] = useState(null);
   const [carsList, setCarsList] = useState(null);
   const [collapsed, setCollapsed] = useState([]);
   const [addCarModal, showAddCarModal] = useState(false);
@@ -20,7 +21,7 @@ const App = () => {
   const getCars = async () => {
     try {
       const cars = await carsApi.getCars();
-      if (cars.data.length > 0) {
+      if (Array.isArray(cars.data)) {
         let sorted = cars.data.sort((a ,b) => {
           return new Date(b.created_at) - new Date(a.created_at);
         })
@@ -37,17 +38,19 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    let filtered = sourceCarsList.filter(car => {
-      const make = car.make.toLowerCase();
-      const model = car.model.toLowerCase();
-      const color = car.color.toLowerCase();
-      const category = car.category.toLowerCase();
-      const trim = car.package.toLowerCase();
-      const lowerCaseSearch = search.toLowerCase();
-      return make.includes(lowerCaseSearch) || model.includes(lowerCaseSearch) || trim.includes(lowerCaseSearch) ||
-      car.year.toString().includes(lowerCaseSearch) || color.includes(lowerCaseSearch) || category.includes(lowerCaseSearch)
-    })
-    setCarsList(filtered);
+    if(sourceCarsList !== null) {
+      let filtered = sourceCarsList.filter(car => {
+        const make = car.make.toLowerCase();
+        const model = car.model.toLowerCase();
+        const color = car.color.toLowerCase();
+        const category = car.category.toLowerCase();
+        const trim = car.package.toLowerCase();
+        const lowerCaseSearch = search.toLowerCase();
+        return make.includes(lowerCaseSearch) || model.includes(lowerCaseSearch) || trim.includes(lowerCaseSearch) ||
+        car.year.toString().includes(lowerCaseSearch) || color.includes(lowerCaseSearch) || category.includes(lowerCaseSearch)
+      })
+      setCarsList(filtered);
+    }
   }, [search])
 
   const dropDown = (id) => {
@@ -117,8 +120,9 @@ const App = () => {
         <button onClick={() => showAddCarModal(addCarModal ? false : true)} className="px-3 py-2 rounded-md text-black border-2 border-black hover:bg-black hover:text-white transition-all font-bold">Add Car</button>
       </div>
       <div className='px-4'>
-        {carsList === null ?  
+        {sourceCarsList === null ?  
         <div className='flex p-4 items-center justify-center font-bold'>Loading...</div> :
+        sourceCarsList.length === 0 ?  <div className='flex p-4 items-center justify-center font-bold'>No Cars.</div> :
         carsMap()}
       </div>
       {addCarModal || editItem !== null ? <AddOrEditCarModal edit={editItem} addCarToState={addCarToState} toggle={() => {showAddCarModal(false); setEditItem(null)}} /> : false}
