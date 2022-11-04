@@ -47,7 +47,7 @@ const App = () => {
       return make.includes(lowerCaseSearch) || model.includes(lowerCaseSearch) || trim.includes(lowerCaseSearch) ||
       car.year.toString().includes(lowerCaseSearch) || color.includes(lowerCaseSearch) || category.includes(lowerCaseSearch)
     })
-    setCarsList(filtered)
+    setCarsList(filtered);
   }, [search])
 
   const dropDown = (id) => {
@@ -71,8 +71,12 @@ const App = () => {
     try {
       const res = await carsApi.deleteCar(deleteItem);
       let carsListClone = carsList.slice(0);
+      let sourceCarsListClone = sourceCarsList.slice(0);
       let filtered = carsListClone.filter(car => car.id !== deleteItem);
+      let sourceFiltered = sourceCarsListClone.filter(car => car.id !== deleteItem);
+
       setCarsList(filtered);
+      setSourceCarsList(sourceFiltered);
     } catch (err) {
       setError('Failed to delete car.');
     }
@@ -84,13 +88,18 @@ const App = () => {
   }
 
   const addCarToState = (car) => {
-    let exists = carsList.findIndex(c => c.id === car.id);
+    let exists = sourceCarsList.findIndex(c => c.id === car.id);
 
     if(exists!== -1) {
       let clone = carsList.slice(0);
+      let sourceClone = sourceCarsList.slice(0);
       clone.splice(exists, 1, car);
+      sourceClone.splice(exists, 1, car);
+
       setCarsList(clone);
+      setSourceCarsList(sourceClone)
     } else {
+      setSourceCarsList([car, ...sourceCarsList])
       setCarsList([car, ...carsList]);
     }
   }
