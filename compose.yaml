@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    networks:
+      - ldr-swarm
+    environment:
+      - POSTGRES_DB=cars
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PORT=6432
+    volumes:
+      - ./data-postgres:/var/lib/postgresql/data
+
+  backend:
+    build:
+      dockerfile: Dockerfile
+      context: ./backend
+    ports:
+      - 4000:4000
+    volumes:
+      - ./data-backend:/backend
+    environment:
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=cars
+      - PGPASSWORD=postgres
+      - PGPORT=5432
+    networks:
+      - ldr-swarm
+    depends_on:
+      - postgres
+
+  frontend:
+    build:
+      dockerfile: Dockerfile
+      context: ./frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data-frontend:/frontend
+    networks:
+      - ldr-swarm
+    depends_on:
+      - backend
+
+networks:
+  ldr-swarm:
